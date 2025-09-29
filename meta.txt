@@ -1,0 +1,130 @@
+Generate the initial code scaffold for a web app called ToggleBox, a creative CSS toolbox.
+
+Goal
+- Create a runnable Next.js + React + Tailwind CSS TypeScript project with three main routes (Builder, Picker, Compare), focusing on the Framework Comparison UI with side-by-side previews of the same component in different CSS frameworks.
+
+Design Notes (Reasoning before implementation)
+- Use Next.js Pages Router to match the /pages structure requirement.
+- Use Tailwind CSS for the app's own styling to align with the existing builder theme.
+- Use iframes to fully isolate framework CSS per preview panel, loading frameworks via CDN.
+- Model frameworks and demo components via typed configs in /data for easy expansion.
+- Provide clean, commented, modular components in /components, including lightweight UI primitives styled like shadcn/ui and lucide-react icons for a modern look.
+- Include placeholders for Export actions and for Builder/Picker pages so they can be filled in later.
+
+Scope and Requirements
+- Tech stack: Next.js, React, TypeScript, Tailwind CSS, lucide-react; lightweight shadcn-style UI primitives.
+- Pages:
+  - Landing (/): Hero with headline “Design, Compare, and Export Your CSS System.” and navigation cards/tabs to Builder, Picker, Compare.
+  - Builder (/builder): Placeholder content and an Export CSS button stub.
+  - Picker (/picker): Placeholder content.
+  - Compare (/compare): The main focus. Side-by-side panels (2 by default, expandable to 3) comparing the same component across frameworks (Bootstrap, Tailwind, Bulma) with live preview and code snippet toggle.
+- Framework Comparison Tool:
+  - Shared component selector (Button, Card, Form, Alert, Navbar).
+  - Framework selectors for each panel (dropdowns) with Bootstrap, Tailwind, Bulma.
+  - Live rendered preview via iframe per panel, loading selected framework CSS via CDN.
+  - Code toggle to show the exact HTML + classes used for the demo component in that framework.
+  - Data-driven configuration in /data/frameworks.ts (names, CDN links, and HTML snippets per component).
+- Export / Try Feature:
+  - Export CSS button on Builder page that downloads a placeholder CSS file (to be wired to the builder later).
+  - Optional Export Comparison button that downloads the current comparison HTML scaffold as a simple .html file (placeholder implementation).
+- Future Expandability:
+  - Add new frameworks by extending /data configs and no/minimal component changes.
+  - Add more demo components by updating the data model and component picker.
+
+Architecture and Folder Structure
+- /components: Reusable UI and feature components
+  - ui/ (Button, Card, Tabs, Select, Toggle, Code, etc., styled with Tailwind and patterned after shadcn/ui)
+  - compare/ (Comparison-specific components like IframePreview, ComparePanel, FrameworkSelector, CodeToggle)
+  - layout/ (AppShell, Header, Footer)
+- /pages: Next.js routes
+  - index.tsx (Landing)
+  - builder.tsx
+  - picker.tsx
+  - compare.tsx
+  - _app.tsx (Tailwind globals)
+- /data: Framework configs and demo HTML snippets
+  - frameworks.ts (types + configs for Bootstrap, Tailwind, Bulma and demo components)
+- /public: Static assets (icons if needed)
+- Project configs: package.json, tsconfig.json, next.config.js, tailwind.config.ts, postcss.config.js, .eslintrc.json, .gitignore
+
+Key Components to Implement
+- IframePreview: Renders srcDoc with linked CDN CSS, sandboxed; accepts cssUrls[], bodyHtml string, optional custom styles.
+- FrameworkSelector: Dropdown with framework options.
+- ComponentSelector: Tabs or select for Button, Card, Form, Alert, Navbar.
+- ComparePanel: Composes selector + preview + code toggle.
+- CodeToggle: Shows corresponding HTML snippet with copy-to-clipboard.
+- AppShell/Header: Basic site shell with navigation to Builder, Picker, Compare; use lucide-react icons.
+
+Types and Data Model
+- Define TypeScript types:
+  - FrameworkId = 'bootstrap' | 'tailwind' | 'bulma'
+  - DemoComponentId = 'button' | 'card' | 'form' | 'alert' | 'navbar'
+  - FrameworkConfig { id, name, cssCdnUrls: string[], jsCdnUrls?: string[], components: Record<DemoComponentId, { title: string; html: string; notes?: string }> }
+- Implement /data/frameworks.ts exporting the configs for Bootstrap, Tailwind, Bulma with CDN links and minimal valid HTML snippets for each DemoComponentId.
+
+UI Behavior Requirements (Compare Page)
+- Default layout: 2 columns side-by-side on desktop, stacked on mobile.
+- Shared component selector at top (tabs or select) changes demo type in both panels.
+- Each panel:
+  - Framework dropdown to choose framework (default: Bootstrap on left, Tailwind on right).
+  - Live preview in an iframe using the selected framework CSS.
+  - Code toggle to reveal the HTML snippet used.
+- Optional third panel support: code structured to easily add a third panel later; include a commented hint on how to enable.
+
+Export Behavior (Scaffold)
+- Builder page: Export CSS button downloads a placeholder css/togglebox.css file with a comment stub.
+- Compare page: Export Comparison button downloads a simple HTML file with two embedded iframes or the combined HTML body of the demo (placeholder).
+
+Accessibility and Quality
+- Use semantic HTML, alt text where applicable, aria attributes for toggles/selects.
+- Comment code for clarity, especially around iframe srcDoc and data modeling.
+- Lint-clean TypeScript and follow basic ESLint/Prettier conventions.
+
+Project Setup Instructions (to include in README section at top of README.md or package.json scripts comment)
+- Install: npm install
+- Dev: npm run dev (http://localhost:3000)
+- Build: npm run build; Start: npm start
+
+Output Format
+- Provide the complete scaffold as plain text with the following structure:
+  1) A concise file tree
+  2) Then, for each file, output:
+     FILE: relative/path/to/file
+     [file contents start]
+     ... file content ...
+     [file contents end]
+- Do not include markdown code fences or extra commentary outside those sections.
+
+Files to Include
+- package.json (with next, react, react-dom, typescript, tailwindcss, postcss, autoprefixer, lucide-react)
+- tsconfig.json
+- next.config.js
+- postcss.config.js
+- tailwind.config.ts
+- .eslintrc.json (basic config)
+- .gitignore
+- styles/globals.css (Tailwind base)
+- pages/_app.tsx
+- pages/index.tsx
+- pages/builder.tsx
+- pages/picker.tsx
+- pages/compare.tsx
+- components/layout/AppShell.tsx
+- components/layout/Header.tsx
+- components/ui/button.tsx
+- components/ui/card.tsx
+- components/ui/tabs.tsx
+- components/ui/select.tsx
+- components/ui/toggle.tsx
+- components/ui/code.tsx
+- components/compare/IframePreview.tsx
+- components/compare/FrameworkSelector.tsx
+- components/compare/ComponentSelector.tsx
+- components/compare/CodeToggle.tsx
+- components/compare/ComparePanel.tsx
+- data/frameworks.ts
+- README.md (short setup + overview)
+
+Notes
+- Keep component implementations minimal but functional and styled with Tailwind; use lucide-react icons where appropriate (e.g., code toggle, external link, copy).
+- Ensure iframe previews are isolated (sandbox, no external script execution unless needed by a framework; for Bootstrap 5 CSS-only demos are fine).
