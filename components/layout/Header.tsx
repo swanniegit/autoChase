@@ -5,10 +5,16 @@ const AuthStatus = dynamic(() => import('@/components/auth/AuthStatus'), { ssr: 
 
 export default function Header() {
   const connected = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const payfastConfigured = Boolean(
-    process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_ID && process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_KEY,
-  );
-  const payfastSandbox = (process.env.NEXT_PUBLIC_PAYFAST_SANDBOX || 'true') === 'true';
+  // Fetch PayFast status from server env via API to avoid leaking secrets and to reflect server truth
+  const [pf, setPf] = React.useState<{ configured: boolean; sandbox: boolean }>({ configured: false, sandbox: true });
+  React.useEffect(() => {
+    fetch('/api/payfast/status')
+      .then((r) => r.json())
+      .then(setPf)
+      .catch(() => {});
+  }, []);
+  const payfastConfigured = pf.configured;
+  const payfastSandbox = pf.sandbox;
   return (
     <header className="border-b border-slate-200 bg-white">
       <div className="container-max flex items-center justify-between py-4">
