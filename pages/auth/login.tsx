@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { supabaseClient } from '@/lib/supabaseClient';
 import Button from '@/components/ui/button';
 
 export default function Login() {
@@ -9,6 +9,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
 
   const send = async () => {
+    const supabase = supabaseClient();
     setError(null);
     const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${location.origin}/autochase` } });
     if (error) setError(error.message); else setSent(true);
@@ -30,4 +31,3 @@ export default function Login() {
     </div>
   );
 }
-

@@ -1,13 +1,18 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { useEffect, useMemo, useState } from 'react';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
+import { supabaseClient } from '@/lib/supabaseClient';
 import Link from 'next/link';
 
 export default function AuthStatus() {
   const [email, setEmail] = useState<string | null>(null);
+  const supabase = useMemo(() => {
+    try { return supabaseClient(); } catch { return null as any; }
+  }, []);
 
   useEffect(() => {
     const run = async () => {
+      if (!supabase) return;
       const { data } = await supabase.auth.getUser();
       setEmail(data.user?.email ?? null);
       if (data.user) {
@@ -19,7 +24,8 @@ export default function AuthStatus() {
       }
     };
     run();
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    if (!supabase) return;
+    const { data: sub } = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
       setEmail(session?.user?.email ?? null);
       if (session?.user) {
         await supabase.from('ac_profiles').upsert(
@@ -45,4 +51,3 @@ export default function AuthStatus() {
     <Link href="/auth/login" className="ml-2 text-xs px-2 py-1 rounded border border-slate-300 hover:bg-slate-50">Login</Link>
   );
 }
-

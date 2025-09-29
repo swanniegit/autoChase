@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '@/lib/supabaseClient';
+import { supabaseClient } from '@/lib/supabaseClient';
 
 export default function RequireAuth() {
   const router = useRouter();
@@ -9,7 +9,9 @@ export default function RequireAuth() {
 
   useEffect(() => {
     const run = async () => {
-      const { data } = await supabase.auth.getUser();
+      let sb;
+      try { sb = supabaseClient(); } catch { router.replace('/auth/login'); return; }
+      const { data } = await sb.auth.getUser();
       if (!data.user) {
         const next = encodeURIComponent(router.asPath || '/autochase');
         router.replace(`/auth/login?next=${next}`);
@@ -23,4 +25,3 @@ export default function RequireAuth() {
   if (!checked) return null;
   return null;
 }
-

@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import { Mail, LayoutDashboard, Settings, FileSpreadsheet, SendHorizonal } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 const AuthStatus = dynamic(() => import('@/components/auth/AuthStatus'), { ssr: false });
 
 export default function Header() {
   const connected = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL);
   // Fetch PayFast status from server env via API to avoid leaking secrets and to reflect server truth
-  const [pf, setPf] = React.useState<{ configured: boolean; sandbox: boolean }>({ configured: false, sandbox: true });
-  React.useEffect(() => {
+  const [pf, setPf] = useState<{ configured: boolean; sandbox: boolean }>({ configured: false, sandbox: true });
+  useEffect(() => {
     fetch('/api/payfast/status')
       .then((r) => r.json())
       .then(setPf)

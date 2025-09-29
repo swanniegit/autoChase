@@ -46,8 +46,10 @@ create table if not exists ac_itn_logs (
 );
 
 alter table ac_itn_logs enable row level security;
--- Admin-only; for now allow read to authenticated users for debugging (tighten later)
-create policy "itn_read_all" on ac_itn_logs for select using (auth.role() = 'authenticated');
+-- Restrict reads to a specific email (update as needed)
+drop policy if exists itn_read_all on ac_itn_logs;
+create policy "itn_read_admin" on ac_itn_logs for select
+  using ((auth.jwt() ->> 'email') = 'christo@yellowarcher.co.za');
 
 -- Profiles map user -> workspace
 create table if not exists ac_profiles (
