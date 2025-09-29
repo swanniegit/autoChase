@@ -14,8 +14,10 @@ pnpm-debug.log*
 # Env
 .env*
 
+# OAuth client secrets (do not commit)
+client_secret_*.json
+
 # Editor
 .DS_Store
 .idea
 *.swp
-
